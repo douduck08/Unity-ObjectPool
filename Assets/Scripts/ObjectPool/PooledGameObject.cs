@@ -34,7 +34,7 @@ public class PooledGameObject : MonoBehaviour {
         this.pool.BackToPool (this);
     }
 
-    public void Clear () {
-        this.pool.Clear ();
+    public void Clear (bool includeUsingObject = true) {
+        this.pool.Clear (includeUsingObject);
     }
 }

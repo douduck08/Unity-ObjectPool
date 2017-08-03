@@ -17,4 +17,7 @@ public class ObjectSpawner : MonoBehaviour {
         }
     }
 
+    private void OnDisable () {
+        pooledPrefab.Clear ();
+    }
 }

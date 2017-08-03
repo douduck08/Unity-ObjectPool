@@ -6,6 +6,7 @@ public class GameObjectPool {
 
     private PooledGameObject m_prefab;
     private List<PooledGameObject> m_availableObjects = new List<PooledGameObject> ();
+    private List<PooledGameObject> m_usingObjects = new List<PooledGameObject> ();
 
     public GameObjectPool (PooledGameObject prefab, int initailSize) {
         m_prefab = prefab;
@@ -33,6 +34,7 @@ public class GameObjectPool {
             if (lastIndex >= 0) {
                 PooledGameObject go = m_availableObjects[lastIndex];
                 m_availableObjects.RemoveAt (lastIndex);
+                m_usingObjects.Add (go);
                 go.gameObject.SetActive (true);
                 if (go.transform.parent != parent) {
                     go.transform.SetParent (parent);
@@ -41,6 +43,7 @@ public class GameObjectPool {
             } else {
                 PooledGameObject go = GameObject.Instantiate<PooledGameObject> (m_prefab, parent);
                 go.pool = this;
+                m_usingObjects.Add (go);
                 return go;
             }
         }
@@ -53,12 +56,21 @@ public class GameObjectPool {
         }
     }
 
-    public void Clear () {
+    public void Clear (bool includeUsingObject = true) {
         lock (m_availableObjects) {
             for (int i = m_availableObjects.Count - 1; i >= 0; i--) {
                 PooledGameObject go = m_availableObjects[i];
                 m_availableObjects.RemoveAt (i);
                 GameObject.Destroy (go.gameObject);
+            }
+        }
+        if (includeUsingObject) {
+            lock (m_usingObjects) {
+                for (int i = m_usingObjects.Count - 1; i >= 0; i--) {
+                    PooledGameObject go = m_usingObjects[i];
+                    m_usingObjects.RemoveAt (i);
+                    GameObject.Destroy (go.gameObject);
+                }
             }
         }
     }
