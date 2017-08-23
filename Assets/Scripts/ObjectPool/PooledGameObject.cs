@@ -9,32 +9,29 @@ public class PooledGameObject : MonoBehaviour {
 
     private GameObjectPool m_pool;
     public GameObjectPool pool {
-        get {
-            if (m_pool == null) {
-                m_pool = new GameObjectPool (this, m_initailSize);
-            }
-            return m_pool;
-        }
         set {
             m_pool = value;
         }
     }
 
-    public void InitailizePool (Transform anchor) {
+    public void InitializePool (Transform anchor) {
         if (m_pool == null) {
             m_pool = new GameObjectPool (this, anchor, m_initailSize);
         }
     }
 
     public PooledGameObject GetPooledInstance (Transform parent) {
-        return this.pool.GetPooledInstance (parent);
+        if (m_pool == null) {
+            m_pool = new GameObjectPool (this, parent, m_initailSize);
+        }
+        return m_pool.GetPooledInstance (parent);
     }
 
     public void BackToPool () {
-        this.pool.BackToPool (this);
+        m_pool.BackToPool (this);
     }
 
     public void Clear (bool includeUsingObject = true) {
-        this.pool.Clear (includeUsingObject);
+        m_pool.Clear (includeUsingObject);
     }
 }
